@@ -10,6 +10,8 @@ from typing import List, Optional
 from app.core.config import settings
 from app.core.logging import logger
 from app.models.schemas import DetectRequest, DetectResponse, Detection, BBox
+from app.services.analyzers.color_analyzer import color_analyzer
+from app.services.analyzers.plate_analyzer import plate_analyzer
 
 COCO_CLASSES = {
     0: "person", 2: "car", 3: "motorcycle", 5: "bus", 7: "truck",
@@ -91,7 +93,9 @@ class YoloService:
 
                     # Detailed analysis placeholders
                     if req.analyze_detailed:
-                        self._enrich_detection(detection, cls_name)
+                        # Crop the detected object for detailed analysis
+                        crop = self._get_crop(frame, x1, y1, x2, y2)
+                        self._enrich_detection(detection, cls_name, crop)
 
                     detections.append(detection)
 
@@ -107,10 +111,25 @@ class YoloService:
         finally:
             await self.queue.get()
 
-    def _enrich_detection(self, detection: Detection, cls_name: str):
+    def _get_crop(self, frame: np.ndarray, x1: float, y1: float, x2: float, y2: float) -> np.ndarray:
+        h, w = frame.shape[:2]
+        ix1, iy1, ix2, iy2 = int(max(0, x1)), int(max(0, y1)), int(min(w, x2)), int(min(h, y2))
+        return frame[iy1:iy2, ix1:ix2]
+
+    def _enrich_detection(self, detection: Detection, cls_name: str, crop: np.ndarray):
         if cls_name in VEHICLE_CLASSES:
-            detection.color = "unknown" 
-            detection.vehicle_type = cls_name
+            try:
+                # Color Analysis
+                detection.color = color_analyzer.get_dominant_color(crop)
+                detection.vehicle_type = cls_name
+                
+                # Plate Reading (LPR)
+                # We only try to read plates if the crop is large enough to likely contain one
+                if crop.shape[0] > 50 and crop.shape[1] > 50:
+                    detection.license_plate = plate_analyzer.read_plate(crop)
+            except Exception as e:
+                logger.error(f"Enrichment error for vehicle {cls_name}: {str(e)}")
+            
         elif cls_name == "person":
             detection.attributes = {"clothing": "unknown", "action": "moving"}
 
