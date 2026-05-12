@@ -1,12 +1,27 @@
 # YOLO11 Inference Microservice
 
-A high-performance FastAPI service for real-time object detection and tracking using YOLO11. This service is designed to be called by the `footage-hub` backend to process surveillance frames.
+A high-performance FastAPI service for real-time object detection and tracking using YOLO11. This service provides REST API endpoints for processing images and video frames with advanced object detection capabilities.
 
 ## Features
 - **YOLO11 Integration**: Uses the latest YOLO11n model for fast inference.
 - **Object Tracking**: Implements ByteTrack for persistent object IDs across frames.
 - **FastAPI**: Asynchronous API endpoints for low-latency communication.
 - **Auto-Hardware Detection**: Automatically uses NVIDIA CUDA if available, otherwise falls back to CPU.
+- **License Plate Recognition**: OCR-based plate detection and text extraction.
+- **Vehicle Color Analysis**: Dominant color detection for tracked vehicles.
+
+## Table of Contents
+- [Prerequisites](#prerequisites)
+- [Setup & Installation](#setup--installation)
+- [Running with Docker](#running-with-docker)
+- [Backend Integration](#backend-integration)
+- [API Endpoints](#api-endpoints-v1)
+- [Project Structure](#project-structure)
+- [Testing the Service](#testing-the-service)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+- [Security](#security)
 
 ## Prerequisites
 - **Python 3.11+**
@@ -55,15 +70,15 @@ docker build -t yolo-service .
 docker run -p 8000:8000 --gpus all yolo-service
 ```
 
-## Backend Integration
-To connect this service to the `footage-hub` backend:
+## Integration with Your Application
+To integrate this service with your application:
 
-1. Locate the `.env` file in the `backend/` directory.
-2. Set the `YOLO_SERVICE_URL`:
+1. Configure your application to point to the service URL:
    ```env
    YOLO_SERVICE_URL=http://localhost:8000
    ```
-3. The backend's `YoloDetector` will now automatically route frames to this service.
+2. Make HTTP requests to the API endpoints (see [API Endpoints](#api-endpoints-v1) section)
+3. The service accepts base64-encoded images and returns detection results in JSON format
 
 ## API Endpoints (v1)
 All modern endpoints are prefixed with `/api/v1`.
@@ -105,6 +120,72 @@ Use the [test_service.py](test_service.py) script to verify that the model corre
    ```
    The script will print the detected objects, their confidence scores, and their bounding boxes.
 
-### 3. Integrated Test
-Once the service is running and the backend `.env` is configured with `YOLO_SERVICE_URL=http://localhost:8000`, the backend logs should confirm initialization:
-`YoloDetector initialized with service URL: http://localhost:8000`
+### 3. Integration Test
+Once the service is running, you can integrate it with your application by configuring the service URL and making API requests to the detection endpoints.
+
+## Documentation
+
+Comprehensive documentation is available in the following files:
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Guidelines for contributing to the project
+  - Development setup and workflow
+  - Coding standards and best practices
+  - Testing guidelines
+  - Pull request process
+
+- **[LICENSE.md](LICENSE.md)** - Licensing information
+  - MIT License for the project
+  - Third-party library licenses
+  - YOLO model licensing requirements
+  - Commercial use considerations
+
+- **[SECURITY.md](SECURITY.md)** - Security policy and best practices
+  - Vulnerability reporting process
+  - Security best practices for deployment
+  - Production security checklist
+  - Compliance considerations (GDPR, CCPA)
+
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community guidelines and expectations
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
+
+Key points:
+- Follow PEP 8 style guidelines
+- Add tests for new features
+- Use conventional commit messages
+- Ensure all tests pass before submitting
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+**Important**: The YOLO11 model weights are subject to the [Ultralytics AGPL-3.0 license](https://github.com/ultralytics/ultralytics/blob/main/LICENSE). Commercial use requires a commercial license from Ultralytics.
+
+## Security
+
+Security is a top priority. Please review our [Security Policy](SECURITY.md) for:
+- Reporting vulnerabilities
+- Security best practices
+- Production deployment guidelines
+
+**Never commit sensitive information** like API keys or credentials to the repository.
+
+## Support
+
+- **Issues**: Report bugs or request features via [GitHub Issues](../../issues)
+- **Discussions**: Ask questions in [GitHub Discussions](../../discussions)
+- **Documentation**: Check the docs folder for detailed guides
+
+## Acknowledgments
+
+- [Ultralytics](https://github.com/ultralytics/ultralytics) for YOLO11
+- [FastAPI](https://fastapi.tiangolo.com/) for the web framework
+- [ByteTrack](https://github.com/ifzhang/ByteTrack) for object tracking
+- [EasyOCR](https://github.com/JaidedAI/EasyOCR) for license plate recognition
+
+---
+
+**Version**: 0.1.0  
+**Last Updated**: May 12, 2026
