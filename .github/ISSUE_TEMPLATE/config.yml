@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/your-org/yolo-service/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/your-org/yolo-service/security/advisories/new
+    about: Report security vulnerabilities privately (do not create public issues)
+  - name: 📚 Documentation
+    url: https://github.com/your-org/yolo-service/blob/main/README.md
+    about: Read the project documentation
+  - name: 🤝 Contributing Guide
+    url: https://github.com/your-org/yolo-service/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to the project
